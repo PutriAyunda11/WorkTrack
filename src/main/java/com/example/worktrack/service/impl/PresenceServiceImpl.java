@@ -61,4 +61,34 @@ public class PresenceServiceImpl implements PresenceService {
 
         return "success";
     }
+
+    @Override
+    public String checkOut(PresenceRequest req, MultipartFile photo) {
+        if (req.getName().isBlank() || req.getPosition().isBlank() || photo == null || photo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data cannot be empty");
+        }
+
+        Position position = positionRepository.findByPositionName(req.getPosition())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Position not found"));
+
+        Employee emp = employeeRepository.findByNameAndPosition(req.getName(), position);
+        if (emp == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found");
+        }
+
+        Presence presence = presenceRepository.findByEmployeeAndExitTimeIsNull(emp)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have not checked in today or already checked out"));
+
+        String photoOutPath = fileStorageService.store(photo);
+        LocalTime timeNow = LocalTime.now();
+
+        long totalMinutes = java.time.temporal.ChronoUnit.MINUTES.between(presence.getEntryTime(), timeNow);
+
+        presence.setPhotoOut(photoOutPath);
+        presence.setExitTime(timeNow);
+        presence.setTotalWorkTime(totalMinutes);
+
+        presenceRepository.save(presence);
+        return "Successfully checked out";
+    }
 }

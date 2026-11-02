@@ -82,7 +82,7 @@ public class LoginServiceImpl implements LoginService {
         Login newData = new Login();
         newData.setUsername(regis.getUsename());
         newData.setPassword(passwordEncoder.encode(regis.getPassword()));
-        newData.setStatus(Status.ACTIVE.getValue());
+        newData.setStatus(Status.ACTIVE.name());
         newData.setEmployee(emp);
         newData.setRole(role);
         loginRepository.save(newData);

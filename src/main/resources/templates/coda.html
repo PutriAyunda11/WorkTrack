@@ -1,0 +1,726 @@
+<!-- <!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/Header::header}"></head>
+<div th:replace="~{fragments/ModalDialog::modalDialog}"></div>
+<style>
+    .no-data {
+        width: 100%;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 16px;
+        margin-top: 90px;
+    }
+
+    .last-updated {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .entries-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .entries-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .entries-select {
+        width: 95px;
+        height: 32px;
+        padding: 2px 9px;
+    }
+
+    .pagination-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .toolbar-top {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .toolbar-bottom {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .search-box {
+        width: 340px;
+    }
+
+    .view-toggle {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: none;
+        background: #1e88e5;
+        position: relative;
+        z-index: 2;
+    }
+
+    .btn-circle i {
+        font-size: 18px;
+        color: white;
+    }
+
+    .btn-circle.left {
+        transform: scale(.82);
+    }
+
+    .btn-circle.right i {
+        font-size: 22px;
+    }
+
+    .btn-circle.right::before {
+        content: "";
+        position: absolute;
+        inset: 6px;
+        border-radius: 50%;
+        background: white;
+        z-index: 1;
+    }
+
+    .btn-circle.right i {
+        color: #1e88e5;
+        position: relative;
+        z-index: 5;
+    }
+
+    .toggle-divider {
+        width: 30px;
+        height: 20px;
+        background: #1e88e5;
+        margin-left: -20px;
+        margin-right: -14px;
+        border-radius: 6px;
+        z-index: 1;
+    }
+
+    .search-clear-btn {
+        border: 2.5px solid #ccc;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-clear-btn i {
+        font-size: 12px;
+        color: #9e9e9e;
+    }
+
+    /* CARD */
+    .news-card {
+        border-radius: 6px;
+        transition: box-shadow .25s ease;
+    }
+
+    .news-card:hover {
+        box-shadow: 0 8px 18px rgba(0, 0, 0, .15);
+    }
+
+    .news-card .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .news-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .news-title {
+        font-size: 16px;
+        font-weight: 600;
+        flex: 1;
+        margin: 0;
+        line-height: 1.4;
+        padding-bottom: 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-img {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+        margin: 10px 0;
+    }
+
+    .news-content {
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 10px;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 5px 0;
+        margin-top: auto;
+    }
+
+    .news-date {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .btn-delete {
+        background: transparent;
+        border: none;
+        padding: 4px;
+    }
+
+    .btn-delete i {
+        font-size: 20px;
+        color: red;
+    }
+
+    .btn-edit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 30px;
+        padding: 0 10px;
+        background: #0d6efd;
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        line-height: 1;
+        text-decoration: none;
+    }
+
+    .btn-edit i {
+        font-size: 15px;
+    }
+
+    .btn-edit:hover {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    /* PAGINATION */
+    .dataTables_paginate {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .paginate_button {
+        padding: 6px 12px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        font-size: 13px;
+        border-radius: 4px;
+        background: #F9FAFB;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .paginate_button:hover:not(.disabled):not(.current) {
+        background: #f1f1f1;
+    }
+
+    .paginate_button.current {
+        background: #0089ED;
+        color: #fff;
+        border-color: #0089ED;
+    }
+
+    .paginate_button.disabled {
+        color: #aaa;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: #f9f9f9;
+    }
+
+    .dataTables_paginate span {
+        display: flex;
+        gap: 5px;
+    }
+
+    #showingInfo {
+        font-size: 13px;
+        color: #6c757d;
+    }
+</style>
+<body>
+<div class="main-wrapper layout-mobility">
+    <nav th:replace="~{fragments/mainMenu::sidebar}"></nav>
+    <div class="page-wrapper">
+        <nav th:replace="~{fragments/Navbar::navbar}"></nav>
+        <div class="page-content">
+            <div class="row mb-2">
+                <div class="col">
+                    <h3 class="b-h3">Berita</h3>
+                    <nav class="page-breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a th:href="@{/dashboard}">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Berita</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            <div class="row">
+                <div class="toolbar">
+                    <div class="toolbar-bottom">
+                        <a class="btn btn-primary btn-add" th:href="@{/company/kadou-trip/create}">
+                            <i class="mdi mdi-plus"></i> Tambah Berita
+                        </a>
+                        <div style="flex: 1;"></div>
+                        <div class="view-toggle">
+                            <button class="btn btn-primary btn-circle left" id="tableViewBtn">
+                                <i class="mdi mdi-table"></i>
+                            </button>
+                            <div class="toggle-divider"></div>
+                            <button class="btn btn-primary btn-circle right" id="cardViewBtn">
+                                <i class="mdi mdi-card-text-outline"></i>
+                            </button>
+                        </div>
+                        <div style="position: relative; width: 340px;">
+                            <input
+                                    type="text"
+                                    id="searchInput"
+                                    class="form-control search-box"
+                                    placeholder="Cari..."
+                                    style="padding-right: 32px;"
+                            >
+                            <button
+                                    type="button"
+                                    id="clearSearch"
+                                    class="search-clear-btn"
+                                    style="
+                                    position: absolute;
+                                    right: 8px;
+                                    top: 50%;
+                                    transform: translateY(-50%);
+                                    display: none;
+                                    padding: 0;
+                                    z-index: 10;
+                                ">
+                                <i class="mdi mdi-close"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="entries-info">
+                <div class="entries-wrapper">
+                    <span>Show</span>
+                    <select id="entriesSelect" class="form-control entries-select">
+                        <option value="6">6</option>
+                        <option value="9">9</option>
+                        <option value="18">18</option>
+                    </select>
+                    <span>entries</span>
+                </div>
+                <div id="showingInfo"></div>
+            </div>
+
+            <div class="row" id="newsContainer"></div>
+
+            <div class="pagination-wrapper">
+                <div id="pagination" class="dataTables_paginate paging_simple_numbers"></div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/Footer::footer}"></footer>
+    </div>
+</div>
+
+<div th:replace="~{fragments/Script::script}"></div>
+<script th:src="@{/assets/js/clear-search.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    let currentPage = 1
+    let totalPages = 1
+    let pageSize = 6
+    let searchValue = ""
+    let draw = 1
+
+    const tableViewUrl = "/kadou-trip-cms/company/kadou-trip/datatabel";
+    const cardViewUrl = "/kadou-trip-cms/company/kadou-trip/list";
+
+   const deleteNewsUrl = '/kadou-trip-cms/company/kadou-trip/delete/'
+   const token = $("meta[name='_csrf']").attr("content")
+   const header = $("meta[name='_csrf_header']").attr("content")
+
+    function loadNews() {
+        const requestDraw = draw
+        draw++
+
+        fetch(`/kadou-trip-cms/company/kadou-trip/list-data?draw=${requestDraw}&page=${currentPage}&size=${pageSize}&search=${searchValue}`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(res => res.json())
+        .then(res => {
+            const data = res.data
+            if (!data) return
+
+            const list = data.content || []
+            const container = document.getElementById("newsContainer")
+            container.innerHTML = ""
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="no-data">Data tidak ditemukan</div>
+                    </div>
+                `
+                totalPages = 0
+                createPagination()
+                updateShowing({ currentPage: 0, pageSize: 0, content: [], allData: 0 })
+                return
+            }
+
+            list.forEach(item => {
+                const desc = stripHtml(item.newsContent || "");
+
+                const col = document.createElement("div");
+                col.className = "col-md-4 mb-4";
+
+                const card = document.createElement("div");
+                card.className = "card news-card h-100";
+
+                const cardBody = document.createElement("div");
+                cardBody.className = "card-body";
+
+                // --- Header ---
+                const newsHeader = document.createElement("div");
+                newsHeader.className = "news-header";
+
+                const titleEl = document.createElement("h5");
+                titleEl.className = "news-title";
+                titleEl.textContent = item.newsTitle; // ✅ aman
+
+                const btnWrapper = document.createElement("div");
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "btn btn-sm btn-delete";
+                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+                deleteBtn.addEventListener("click", () => deleteNews(item.newsUuid)); // ✅ bukan onclick string
+                btnWrapper.appendChild(deleteBtn);
+
+                newsHeader.appendChild(titleEl);
+                newsHeader.appendChild(btnWrapper);
+
+                // --- Image ---
+                const img = document.createElement("img");
+                img.className = "news-img";
+                img.src = item.newsImage;       // ✅ property assignment, bukan innerHTML
+                img.alt = "";
+
+                // --- Description ---
+                const descEl = document.createElement("p");
+                descEl.className = "news-content";
+                descEl.textContent = desc;      // ✅ aman, sudah di-strip
+
+                // --- Footer ---
+                const newsFooter = document.createElement("div");
+                newsFooter.className = "news-footer";
+
+                const dateEl = document.createElement("span");
+                dateEl.className = "news-date";
+                dateEl.textContent = formatDate(item.createdDate); // ✅ aman
+
+                const editLink = document.createElement("a");
+                editLink.className = "btn-edit";
+                editLink.href = `/kadou-trip-cms/company/kadou-trip/${encodeURIComponent(item.newsUuid)}`; // ✅ aman
+                editLink.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit`;
+
+                newsFooter.appendChild(dateEl);
+                newsFooter.appendChild(editLink);
+
+                // --- Assemble ---
+                cardBody.appendChild(newsHeader);
+                cardBody.appendChild(img);
+                cardBody.appendChild(descEl);
+                cardBody.appendChild(newsFooter);
+                card.appendChild(cardBody);
+                col.appendChild(card);
+                container.appendChild(col); // ✅ bukan innerHTML +=
+            });
+
+            totalPages = data.lastPage || 1
+            createPagination()
+            updateShowing(data)
+        })
+        .catch(err => {
+            console.error("Error load news:", err)
+        })
+    }
+
+    window.addEventListener("pageshow", function (event) {
+
+        // Reset search input
+        const input = document.getElementById("searchInput");
+        const clearBtn = document.getElementById("clearSearch");
+
+        if (input) {
+            input.value = "";
+        }
+
+        // Reset variable search
+        searchValue = "";
+        currentPage = 1;
+
+        if (clearBtn) {
+            clearBtn.style.display = "none";
+        }
+
+        // Reload data
+        loadNews();
+
+    });
+
+    function createPagination() {
+        const pagination = document.getElementById("pagination")
+        let html = ""
+
+        if (totalPages < 1) {
+            pagination.innerHTML = ""
+            return
+        }
+
+        html += `
+            <a class="paginate_button previous ${currentPage === 1 ? 'disabled' : ''}"
+               onclick="changePage(${currentPage - 1})">
+                Previous
+            </a>
+        `
+
+        let startPage, endPage
+        if (totalPages <= 7) {
+            startPage = 1
+            endPage = totalPages
+        } else if (currentPage <= 4) {
+            startPage = 1
+            endPage = 4
+        } else if (currentPage >= totalPages - 3) {
+            startPage = totalPages - 3
+            endPage = totalPages
+        } else {
+            startPage = currentPage - 1
+            endPage = currentPage + 1
+        }
+
+        if (startPage > 1) {
+            html += `<a class="paginate_button" onclick="changePage(1)">1</a>`
+            if (startPage > 2) html += `<span class="paginate_button disabled">...</span>`
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+                <a class="paginate_button ${i === currentPage ? 'current' : ''}"
+                   onclick="changePage(${i})">
+                    ${i}
+                </a>
+            `
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<span class="paginate_button disabled">...</span>`
+            html += `
+                <a class="paginate_button" onclick="changePage(${totalPages})">
+                    ${totalPages}
+                </a>
+            `
+        }
+
+        html += `
+            <a class="paginate_button next ${currentPage === totalPages ? 'disabled' : ''}"
+               onclick="changePage(${currentPage + 1})">
+                Next
+            </a>
+        `
+
+        pagination.innerHTML = html
+    }
+
+    function changePage(page) {
+        if (page < 1 || page > totalPages || page === currentPage) return
+        currentPage = page
+        loadNews()
+        window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+
+    function updateShowing(data) {
+        const el = document.getElementById("showingInfo");
+        if (!data.content || data.content.length === 0) {
+            el.textContent = "Showing 0 to 0 of 0 entries";
+            return;
+        }
+        const start = ((data.currentPage - 1) * data.pageSize) + 1;
+        const end   = start + data.content.length - 1;
+
+        el.textContent = `Showing ${start} to ${end} of ${data.allData} entries`;
+    }
+
+    function stripHtml(html) {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        return doc.body.textContent || "";
+    }
+
+    function formatDate(arr) {
+        if (!arr) return "-"
+        return `${arr[2]}-${arr[1]}-${arr[0]}`
+    }
+
+    function deleteNews(uuid) {
+
+        modalConfirm(
+            {
+                title: 'Apakah Anda yakin?',
+                text: 'Apakah Anda yakin ingin menghapus berita ini?'
+            },
+            function (confirmed) {
+
+                if (confirmed) {
+
+                    fetch("/kadou-trip-cms/company/kadou-trip/delete/" + uuid, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": $("meta[name='_csrf']").attr("content")
+                        }
+                    })
+                    .then(response => {
+
+                        if (response.ok) {
+
+                            modalMmcSuccess(
+                                "Berita berhasil dihapus"
+                            );
+
+                            $("#btnModalMmcSuccess")
+                                .off('click')
+                                .on('click', function () {
+
+                                    loadNews();
+
+                                });
+
+                        } else {
+
+                            modalSubmitFailedMmc("Gagal menghapus berita");
+
+                        }
+
+                    })
+                    .catch(error => {
+
+                        console.error(error);
+                        modalSubmitFailedMmc("Terjadi kesalahan saat delete");
+
+                    });
+
+                }
+
+            }
+        );
+
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", function (e) {
+        if (e.key === "Enter") {
+            searchValue = this.value
+            currentPage = 1
+            loadNews()
+        }
+    })
+
+    document.getElementById("searchInput").addEventListener("input", function () {
+        const clearBtn = document.getElementById("clearSearch")
+        clearBtn.style.display = this.value.trim() !== "" ? "flex" : "none"
+    })
+
+    document.getElementById("clearSearch").addEventListener("click", function () {
+        const input = document.getElementById("searchInput")
+        input.value = ""
+        searchValue = ""
+        this.style.display = "none"
+        currentPage = 1
+        loadNews()
+    })
+
+    document.getElementById("entriesSelect").addEventListener("change", function () {
+        pageSize = parseInt(this.value)
+        currentPage = 1
+        loadNews()
+    })
+
+    document.getElementById("tableViewBtn").addEventListener("click", function () {
+        window.location.href = tableViewUrl
+    })
+
+    document.getElementById("cardViewBtn").addEventListener("click", function () {
+        window.location.href = cardViewUrl
+    })
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadNews()
+    })
+
+    function formatDate(val) {
+        if (!val) return "-"
+        // Kalau array [year, month, day]
+        if (Array.isArray(val)) return `${String(val[2]).padStart(2,'0')}-${String(val[1]).padStart(2,'0')}-${val[0]}`
+        // Kalau string ISO
+        const d = new Date(val)
+        return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#x27;");
+    }
+</script>
+</body>
+</html> -->

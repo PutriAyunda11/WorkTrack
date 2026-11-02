@@ -22,6 +22,7 @@ public class Presence {
     private int id;
     private Date datePresence;
     private String photo;
+    private String photoOut;
     private LocalTime entryTime;
     private LocalTime exitTime;
     private long totalWorkTime;

@@ -45,15 +45,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/employee/**").hasAuthority(RoleEnum.ADMIN.getValue())
                         .requestMatchers(
                                 "/authentication/**",
                                 "/presence/**",
-                                "/employee/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**")
-                        .permitAll()
-                        .anyRequest().authenticated()// semua endpoint bebas diakses
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .requestMatchers("/employee/**").hasAuthority(RoleEnum.ADMIN.getValue())
+//                        .requestMatchers().hasAuthority(RoleEnum.EMPLOYEE.getValue())
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -19,13 +19,45 @@ public class PresenceController {
     }
 
     @PostMapping(value = "/check-in", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GenericResponse<String>> checkIn(@RequestPart("req") PresenceRequest req, @RequestPart("photo") MultipartFile photo){
-        String data =presenceService.checkIn(req, photo);
-        return ResponseEntity.ok().body(GenericResponse.<String>builder()
-                .success(true)
-                .message("successfully")
-                .data(data)
-                .build());
+    public ResponseEntity<GenericResponse<String>> checkIn(
+            @RequestParam String name,
+            @RequestParam String position,
+            @RequestPart MultipartFile photo
+    ) {
+        PresenceRequest req = PresenceRequest.builder()
+                .name(name)
+                .position(position)
+                .build();
+        String data = presenceService.checkIn(req, photo);
+        return ResponseEntity.ok().body(
+                GenericResponse.<String>builder()
+                        .success(true)
+                        .message("successfully")
+                        .data(data)
+                        .build()
+        );
+    }
+
+    @PostMapping(value = "/check-out", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GenericResponse<String>> checkOut(
+            @RequestParam String name,
+            @RequestParam String position,
+            @RequestPart MultipartFile photo
+    ) {
+        PresenceRequest req = PresenceRequest.builder()
+                .name(name)
+                .position(position)
+                .build();
+
+        String data = presenceService.checkOut(req, photo);
+
+        return ResponseEntity.ok().body(
+                GenericResponse.<String>builder()
+                        .success(true)
+                        .message("successfully checked out")
+                        .data(data)
+                        .build()
+        );
     }
 
 }

@@ -135,7 +135,7 @@ public class InitialDataLoader implements ApplicationRunner{
         }
 
         if(loginRepository.findAll().isEmpty()){
-                Role cari = roleRepository.findRoleByName(RoleEnum.ADMIN.name());
+                Role cari = roleRepository.findRoleByName(RoleEnum.ADMIN.getValue());
             Login login = Login.builder()
                     .username(RoleEnum.ADMIN.name())
                     .password(passwordEncoder.encode("ADMIN123"))
