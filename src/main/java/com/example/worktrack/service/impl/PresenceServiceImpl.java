@@ -54,7 +54,7 @@ public class PresenceServiceImpl implements PresenceService {
         Presence presence = new Presence();
 
         presence.setEmployee(emp);
-        presence.setPhoto(photoPath);
+        presence.setPhotoIn(photoPath);
         presence.setDatePresence(dateNow);
         presence.setEntryTime(timeNow);
         presenceRepository.save(presence);

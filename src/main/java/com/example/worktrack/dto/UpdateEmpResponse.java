@@ -18,6 +18,7 @@ public class UpdateEmpResponse {
     private String address;
     private LocalDate joiningDate;
     private String Status;
+    private Long monthlySalary;
     private String position;
 
 }

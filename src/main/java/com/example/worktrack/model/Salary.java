@@ -24,9 +24,11 @@ public class Salary {
     @Column(name = "id", nullable=false)
     private int id;
     private String periode;
-    private long totalTimeWork;
-    private long bonuses;
+    private long totalDayWork;
+    private long overtime;
+    private long deduction;
     private long totalSalary;
+    private String noted;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

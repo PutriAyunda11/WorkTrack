@@ -70,6 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         emp.setAddress(data.getAddress());
         emp.setStatus(Status.ACTIVE.getValue());
         emp.setJoiningDate(LocalDate.now());
+        emp.setMonthlySalary(data.getMonthlySalary());
         emp.setPosition(position);
         employeeRepository.save(emp);
     }
@@ -118,6 +119,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                 Position position = positionRepository.findByPositionName(data.getPosition())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Position not found"));
                 emp.setPosition(position);
+            }
+        }
+
+        if(data.getMonthlySalary() != null  && data.getMonthlySalary() > 0){
+            if(emp.getMonthlySalary() == null || emp.getMonthlySalary() == 0){
+                emp.setMonthlySalary(data.getMonthlySalary());
             }
         }
 

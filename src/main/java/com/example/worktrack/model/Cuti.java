@@ -27,10 +27,4 @@ public class Cuti {
     private String tipeCuti;
     private int totalCuti;
 
-//    @OneToMany(mappedBy = "cuti", cascade = CascadeType.ALL)
-//    private List<LaporanCuti> laporanCuti;
-//
-//    @OneToMany(mappedBy = "cuti", cascade = CascadeType.ALL)
-//    private List<LaporanIzin> laporanizin;
-
 }

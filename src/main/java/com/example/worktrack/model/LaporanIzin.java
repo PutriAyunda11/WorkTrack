@@ -1,7 +1,7 @@
 package com.example.worktrack.model;
 
 import java.sql.Blob;
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,8 +26,8 @@ public class LaporanIzin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
-    private Date startDate;
-    private Date finishDate;
+    private LocalDate startDate;
+    private LocalDate finishDate;
     private String noted;
 
     @Lob
@@ -37,9 +37,5 @@ public class LaporanIzin {
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
-
-    @ManyToOne
-    @JoinColumn(name = "cuti_id")
-    private Cuti cuti;
 
 }

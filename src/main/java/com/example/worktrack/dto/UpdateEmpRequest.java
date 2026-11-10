@@ -14,4 +14,5 @@ public class UpdateEmpRequest {
     private String noTelp;
     private String address;
     private String position;
+    private Long monthlySalary;
 }

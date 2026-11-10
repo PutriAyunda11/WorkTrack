@@ -25,10 +25,5 @@ public class Position {
     @Column(name = "id", nullable = false)
     private int id;
     private String positionName;
-    private long timeWork;
-    private long hourlySalary;
-
-//    @OneToMany(mappedBy = "position", cascade = CascadeType.ALL)
-//    private List<Employee> employee;
 
 }

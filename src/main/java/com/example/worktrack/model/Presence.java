@@ -21,7 +21,7 @@ public class Presence {
     @Column(name = "id", nullable = false )
     private int id;
     private Date datePresence;
-    private String photo;
+    private String photoIn;
     private String photoOut;
     private LocalTime entryTime;
     private LocalTime exitTime;

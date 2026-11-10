@@ -24,6 +24,9 @@ public class AddEmployeeRequest {
     @NotBlank(message = "Address is required")
     private String address;
 
+    @NotBlank(message = "Address is required")
+    private Long monthlySalary;
+
     @NotBlank(message = "Position is required")
     private String position;
     

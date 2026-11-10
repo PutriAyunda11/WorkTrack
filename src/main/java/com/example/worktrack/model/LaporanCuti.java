@@ -1,6 +1,6 @@
 package com.example.worktrack.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,17 +24,14 @@ public class LaporanCuti {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
-    private Date submissionDate;
-    private Date startDate;
-    private Date finishDate;
-    private long longDuti;
+    private LocalDate submissionDate;
+    private LocalDate startDate;
+    private LocalDate finishDate;
+    private long longCuti;
     private String status;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @ManyToOne
-    @JoinColumn(name = "cuti_id")
-    private Cuti cuti;
 }
