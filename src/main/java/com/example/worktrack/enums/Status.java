@@ -2,7 +2,9 @@ package com.example.worktrack.enums;
 
 public enum Status {
     ACTIVE ("Active"),
-    INACTIVE ("Inactive");
+    INACTIVE ("Inactive"),
+    LATE("Late"),
+    ON_TIME("On Time");
 
     private final String value;
 

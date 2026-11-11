@@ -25,8 +25,9 @@ public class Presence {
     private String photoOut;
     private LocalTime entryTime;
     private LocalTime exitTime;
+    private String status;       //terlambat, tepat waktu,
     private long totalWorkTime;
-    private String noted;
+    private String noted;       // noted kalo lembur
     
     @ManyToOne
     @JoinColumn(name = "employee_id")

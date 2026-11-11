@@ -1,5 +1,6 @@
 package com.example.worktrack.init;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.example.worktrack.enums.CutiEnum;
@@ -81,37 +82,14 @@ public class InitialDataLoader implements ApplicationRunner{
         }
 
         if(positionRepository.findAll().isEmpty()){
-            Position op = new Position();
-            op.setPositionName(PositionEnum.OPERATOR_PRODUKSI.getValue());
-
-            Position hp = new Position();
-            hp.setPositionName(PositionEnum.HELPER_PRODUKSI.getValue());
-
-            Position tm = new Position();
-            tm.setPositionName(PositionEnum.TEKNISI_MESIN.getValue());
-
-            Position qc = new Position();
-            qc.setPositionName(PositionEnum.QUALITY_CONTROL.getValue());
-
-            Position sg = new Position();
-            sg.setPositionName(PositionEnum.STAF_GUDANG.getValue());
-
-            Position ag = new Position();
-            ag.setPositionName(PositionEnum.ADMIN_GUDANG.getValue());
-
-            Position cs = new Position();
-            cs.setPositionName(PositionEnum.CLEANING_SERVICE.getValue());
-
-            Position sec = new Position();
-            sec.setPositionName(PositionEnum.SECURITY.getValue());
-
-            Position hrd = new Position();
-            hrd.setPositionName(PositionEnum.ADMIN_HRD.getValue());
-
-            Position hrs = new Position();
-            hrs.setPositionName(PositionEnum.HR_SUPERVISIOR.getValue());
-
-            positionRepository.saveAll(List.of(op,hp,tm,qc,sg,ag,cs,sec,hrd,hrs));
+            List<Position> positions = Arrays.stream(PositionEnum.values())
+                    .map(enumPost ->{
+                        Position pos = new Position();
+                        pos.setPositionName(enumPost.getValue());
+                        return pos;
+                    })
+                    .toList();
+            positionRepository.saveAll(positions);
         }
 
         if(loginRepository.findAll().isEmpty()){

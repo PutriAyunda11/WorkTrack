@@ -53,10 +53,13 @@ public class PresenceServiceImpl implements PresenceService {
         String photoPath = fileStorageService.store(photo);
         Presence presence = new Presence();
 
+        //BELUM SET STATUS NYA KARENA HARUS SET DULU EMPLOYEE WORK SCHEDULE
+
         presence.setEmployee(emp);
         presence.setPhotoIn(photoPath);
         presence.setDatePresence(dateNow);
         presence.setEntryTime(timeNow);
+//        presence.setStatus();
         presenceRepository.save(presence);
 
         return "success";

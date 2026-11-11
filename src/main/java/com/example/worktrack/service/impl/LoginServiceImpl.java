@@ -73,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
         }
         Role role = new Role();
         if (position.getPositionName().equalsIgnoreCase(PositionEnum.ADMIN_HRD.getValue()) ||
-                position.getPositionName().equalsIgnoreCase(PositionEnum.HR_SUPERVISIOR.getValue())) {
+                position.getPositionName().equalsIgnoreCase(PositionEnum.HR_SUPERVISOR.getValue())) {
             role = roleRepository.findRoleByName(RoleEnum.ADMIN.getValue());
         } else {
             role = roleRepository.findRoleByName(RoleEnum.EMPLOYEE.getValue());

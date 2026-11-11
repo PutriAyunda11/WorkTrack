@@ -8,7 +8,11 @@ import java.util.List;
 import com.example.worktrack.constant.ConstantValue;
 import com.example.worktrack.dto.UpdateEmpRequest;
 import com.example.worktrack.dto.UpdateEmpResponse;
+import com.example.worktrack.enums.DayEnum;
+import com.example.worktrack.enums.PositionEnum;
 import com.example.worktrack.enums.Status;
+import com.example.worktrack.model.WorkSchedule;
+import com.example.worktrack.repository.WorkScheduleRepository;
 import com.example.worktrack.service.EmployeeService;
 import org.springframework.http.HttpStatus;
 // import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +30,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     private final EmployeeRepository employeeRepository;
     private final PositionRepository positionRepository;
+    private final WorkScheduleRepository workScheduleRepository;
 
     // @Autowired
-    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository){
+    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository, WorkScheduleRepository workScheduleRepository){
         this.employeeRepository=employeeRepository;
         this.positionRepository=positionRepository;
+        this.workScheduleRepository=workScheduleRepository;
     }
 
     @Override
@@ -62,6 +68,53 @@ public class EmployeeServiceImpl implements EmployeeService {
                             .orElseThrow(
                                 ()-> new ResponseStatusException( HttpStatus.NOT_FOUND,"Data position not found")
                             );
+
+        boolean isWorkingDay = false;
+        if(data.getPosition() != null && !data.getPosition().isBlank()){
+            if(data.getPosition().equalsIgnoreCase(PositionEnum.ADMIN_HRD.getValue()) || data.getPosition().equalsIgnoreCase(PositionEnum.HR_SUPERVISOR.getValue())
+                || data.getPosition().equalsIgnoreCase(PositionEnum.PPIC.getValue()) || data.getPosition().equalsIgnoreCase(PositionEnum.ADMIN_GUDANG.getValue())){
+                isWorkingDay = false;
+            }else {
+                isWorkingDay = true;
+            }
+        }
+
+        WorkSchedule mon = WorkSchedule.builder()
+                .day(DayEnum.MONDAY.getValue())
+                .workingDay(true)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule tues = WorkSchedule.builder()
+                .day(DayEnum.TUESDAY.getValue())
+                .workingDay(true)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule wed = WorkSchedule.builder()
+                .day(DayEnum.WEDNESDAY.getValue())
+                .workingDay(true)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule thurs = WorkSchedule.builder()
+                .day(DayEnum.THURSDAY.getValue())
+                .workingDay(true)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule fri = WorkSchedule.builder()
+                .day(DayEnum.FRIDAY.getValue())
+                .workingDay(true)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule satur = WorkSchedule.builder()
+                .day(DayEnum.SATURDAY.getValue())
+                .workingDay(isWorkingDay)
+                .namePosition(data.getPosition())
+                .build();
+        WorkSchedule sun = WorkSchedule.builder()
+                .day(DayEnum.SUNDAY.getValue())
+                .workingDay(isWorkingDay)
+                .namePosition(data.getPosition())
+                .build();
+        workScheduleRepository.saveAll(List.of(mon, tues, wed, thurs, fri, satur, sun));
 
         Employee emp = new Employee();
         emp.setName(data.getName());

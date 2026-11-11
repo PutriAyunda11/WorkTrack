@@ -10,7 +10,9 @@ public enum PositionEnum {
     ADMIN_GUDANG ("Admin Gudang"),
     CLEANING_SERVICE ("Cleaning Service"),
     SECURITY ("Security"),
-    HR_SUPERVISIOR ("HR Supervisior");
+    HR_SUPERVISOR ("HR Supervisor"),
+    SUPERVISOR_PRODUKSI ("Supervisor Produksi"),
+    PPIC ("Production Planning & Inventory Control");
 
     private final String value;
 
