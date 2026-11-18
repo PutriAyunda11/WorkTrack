@@ -1,8 +1,9 @@
 package com.example.worktrack.controller;
 
 import com.example.worktrack.dto.UpdateEmpRequest;
-import com.example.worktrack.dto.UpdateEmpResponse;
-import com.example.worktrack.model.Employee;
+import com.example.worktrack.dto.EmpResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,24 +27,24 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<GenericResponse<Object>> add(@Valid @RequestBody AddEmployeeRequest data){
+    public ResponseEntity<GenericResponse<EmpResponse>> add(@Valid @RequestBody AddEmployeeRequest data){
         try {
-            emp.addEmployee(data);
-            return ResponseEntity.ok().body(GenericResponse.builder()
+            EmpResponse result = emp.addEmployee(data);
+            return ResponseEntity.ok().body(GenericResponse.<EmpResponse>builder()
                     .success(true)
                     .message("Successfully")
-                    .data(null)
+                    .data(result)
                     .build());
             
         }catch(ResponseStatusException rse){
-            return ResponseEntity.status(rse.getStatusCode()).body(GenericResponse.builder()
+            return ResponseEntity.status(rse.getStatusCode()).body(GenericResponse.<EmpResponse>builder()
                     .success(false)
                     .message(rse.getReason())
                     .data(null)
                     .build());
                     
         }catch (Exception e) {
-            return ResponseEntity.internalServerError().body(GenericResponse.builder()
+            return ResponseEntity.internalServerError().body(GenericResponse.<EmpResponse>builder()
                     .success(false)
                     .message("internal server error")
                     .data(null)
@@ -53,22 +54,22 @@ public class EmployeeController {
     }
 
     @PostMapping("/update-employee")
-    public ResponseEntity<GenericResponse<Employee>> updateEmp(@RequestBody UpdateEmpRequest data){
+    public ResponseEntity<GenericResponse<EmpResponse>> updateEmp(@RequestBody UpdateEmpRequest data){
         try {
-            Employee dataEmp = emp.updateEmployee(data);
-            return ResponseEntity.ok().body(GenericResponse.<Employee>builder()
+            EmpResponse dataEmp = emp.updateEmployee(data);
+            return ResponseEntity.ok().body(GenericResponse.<EmpResponse>builder()
                     .success(true)
                     .message("Successfully")
                     .data(dataEmp)
                     .build());
         }catch (ResponseStatusException re){
-            return ResponseEntity.status(re.getStatusCode()).body(GenericResponse.<Employee>builder()
+            return ResponseEntity.status(re.getStatusCode()).body(GenericResponse.<EmpResponse>builder()
                     .success(false)
-                    .message(re.getMessage())
+                    .message(re.getReason())
                     .data(null)
                     .build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(GenericResponse.<Employee>builder()
+            return ResponseEntity.internalServerError().body(GenericResponse.<EmpResponse>builder()
                     .success(false)
                     .message("internal server error")
                     .data(null)
@@ -76,10 +77,10 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping("all-employee")
-    public ResponseEntity<GenericResponse<List<UpdateEmpResponse>>> getAllEmployee(){
-        List<UpdateEmpResponse> data =emp.getAllEmployee();
-        return ResponseEntity.ok().body(GenericResponse.<List<UpdateEmpResponse>>builder()
+    @GetMapping("/all-employee")
+    public ResponseEntity<GenericResponse<Page<EmpResponse>>> getAllEmployee( Pageable pageable){
+        Page<EmpResponse> data =emp.getAllEmployee(pageable);
+        return ResponseEntity.ok().body(GenericResponse.<Page<EmpResponse>>builder()
                 .success(true)
                 .message("successfully")
                 .data(data)

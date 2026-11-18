@@ -7,15 +7,12 @@ import java.util.List;
 
 import com.example.worktrack.constant.ConstantValue;
 import com.example.worktrack.dto.UpdateEmpRequest;
-import com.example.worktrack.dto.UpdateEmpResponse;
-import com.example.worktrack.enums.DayEnum;
-import com.example.worktrack.enums.PositionEnum;
+import com.example.worktrack.dto.EmpResponse;
 import com.example.worktrack.enums.Status;
-import com.example.worktrack.model.WorkSchedule;
-import com.example.worktrack.repository.WorkScheduleRepository;
 import com.example.worktrack.service.EmployeeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-// import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,17 +27,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     private final EmployeeRepository employeeRepository;
     private final PositionRepository positionRepository;
-    private final WorkScheduleRepository workScheduleRepository;
 
     // @Autowired
-    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository, WorkScheduleRepository workScheduleRepository){
+    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository){
         this.employeeRepository=employeeRepository;
         this.positionRepository=positionRepository;
-        this.workScheduleRepository=workScheduleRepository;
     }
 
     @Override
-    public void addEmployee(AddEmployeeRequest data){
+    public EmpResponse addEmployee(AddEmployeeRequest data){
 
         String email = data.getEmail();
 
@@ -69,52 +64,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                                 ()-> new ResponseStatusException( HttpStatus.NOT_FOUND,"Data position not found")
                             );
 
-        boolean isWorkingDay = false;
-        if(data.getPosition() != null && !data.getPosition().isBlank()){
-            if(data.getPosition().equalsIgnoreCase(PositionEnum.ADMIN_HRD.getValue()) || data.getPosition().equalsIgnoreCase(PositionEnum.HR_SUPERVISOR.getValue())
-                || data.getPosition().equalsIgnoreCase(PositionEnum.PPIC.getValue()) || data.getPosition().equalsIgnoreCase(PositionEnum.ADMIN_GUDANG.getValue())){
-                isWorkingDay = false;
-            }else {
-                isWorkingDay = true;
-            }
-        }
-
-        WorkSchedule mon = WorkSchedule.builder()
-                .day(DayEnum.MONDAY.getValue())
-                .workingDay(true)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule tues = WorkSchedule.builder()
-                .day(DayEnum.TUESDAY.getValue())
-                .workingDay(true)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule wed = WorkSchedule.builder()
-                .day(DayEnum.WEDNESDAY.getValue())
-                .workingDay(true)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule thurs = WorkSchedule.builder()
-                .day(DayEnum.THURSDAY.getValue())
-                .workingDay(true)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule fri = WorkSchedule.builder()
-                .day(DayEnum.FRIDAY.getValue())
-                .workingDay(true)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule satur = WorkSchedule.builder()
-                .day(DayEnum.SATURDAY.getValue())
-                .workingDay(isWorkingDay)
-                .namePosition(data.getPosition())
-                .build();
-        WorkSchedule sun = WorkSchedule.builder()
-                .day(DayEnum.SUNDAY.getValue())
-                .workingDay(isWorkingDay)
-                .namePosition(data.getPosition())
-                .build();
-        workScheduleRepository.saveAll(List.of(mon, tues, wed, thurs, fri, satur, sun));
 
         Employee emp = new Employee();
         emp.setName(data.getName());
@@ -125,11 +74,26 @@ public class EmployeeServiceImpl implements EmployeeService {
         emp.setJoiningDate(LocalDate.now());
         emp.setMonthlySalary(data.getMonthlySalary());
         emp.setPosition(position);
-        employeeRepository.save(emp);
+
+        Employee savedEmp = employeeRepository.save(emp);
+
+        EmpResponse response = EmpResponse.builder()
+                .id(savedEmp.getId())
+                .name(savedEmp.getName())
+                .address(savedEmp.getAddress())
+                .email(savedEmp.getEmail())
+                .noTelp(savedEmp.getNoTelp())
+                .joiningDate(savedEmp.getJoiningDate())
+                .status(savedEmp.getStatus())
+                .monthlySalary(savedEmp.getMonthlySalary())
+                .position(savedEmp.getPosition().getPositionName())
+                .build();
+
+        return response;
     }
 
     @Override
-    public Employee updateEmployee(UpdateEmpRequest data){
+    public EmpResponse updateEmployee(UpdateEmpRequest data){
         Employee emp = employeeRepository.findById(data.getId())
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Employee is not Available"));
 
@@ -176,36 +140,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if(data.getMonthlySalary() != null  && data.getMonthlySalary() > 0){
-            if(emp.getMonthlySalary() == null || emp.getMonthlySalary() == 0){
                 emp.setMonthlySalary(data.getMonthlySalary());
-            }
         }
 
         emp.setUpdateAt(LocalDateTime.now());
-        employeeRepository.save(emp);
+        Employee savedEmp = employeeRepository.save(emp);
 
-        Employee get = employeeRepository.findById(emp.getId())
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "DATA NOT FOUND"));
+        EmpResponse response = EmpResponse.builder()
+                .id(savedEmp.getId())
+                .name(savedEmp.getName())
+                .address(savedEmp.getAddress())
+                .noTelp(savedEmp.getNoTelp())
+                .email(savedEmp.getEmail())
+                .status(savedEmp.getStatus())
+                .monthlySalary(savedEmp.getMonthlySalary())
+                .joiningDate(savedEmp.getJoiningDate())
+                .position(savedEmp.getPosition().getPositionName())
+                .build();
 
-        return get;
+        return response;
     }
 
     @Override
-    public List<UpdateEmpResponse> getAllEmployee(){
-        List<Employee> emp =employeeRepository.findAll();
-        List<UpdateEmpResponse> data = new ArrayList<>();
-        for(Employee tamp : emp){
-            UpdateEmpResponse dataTamp= new UpdateEmpResponse();
+    public Page<EmpResponse> getAllEmployee(Pageable pageable){
+        Page<Employee> emp = employeeRepository.findAll(pageable);
+
+        return emp.map(tamp -> {
+            EmpResponse dataTamp= new EmpResponse();
             dataTamp.setId(tamp.getId());
             dataTamp.setName(tamp.getName());
             dataTamp.setEmail(tamp.getEmail());
             dataTamp.setAddress(tamp.getAddress());
             dataTamp.setNoTelp(tamp.getNoTelp());
             dataTamp.setStatus(tamp.getStatus());
+            dataTamp.setMonthlySalary(tamp.getMonthlySalary());
             dataTamp.setJoiningDate(tamp.getJoiningDate());
             dataTamp.setPosition(tamp.getPosition().getPositionName());
-            data.add(dataTamp);
-        }
-        return data;
+            return dataTamp;
+        });
     }
 }

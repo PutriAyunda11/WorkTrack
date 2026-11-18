@@ -1,27 +1,18 @@
 package com.example.worktrack.init;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.worktrack.enums.CutiEnum;
-import com.example.worktrack.enums.PositionEnum;
-import com.example.worktrack.enums.RoleEnum;
-import com.example.worktrack.enums.Status;
+import com.example.worktrack.enums.*;
+import com.example.worktrack.model.*;
+import com.example.worktrack.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.example.worktrack.model.Cuti;
-import com.example.worktrack.model.Login;
-import com.example.worktrack.model.Position;
-import com.example.worktrack.model.Role;
-import com.example.worktrack.repository.CutiRepository;
-import com.example.worktrack.repository.LoginRepository;
-import com.example.worktrack.repository.PositionRepository;
-import com.example.worktrack.repository.RoleRepository;
 
 
 @Component
@@ -41,6 +32,9 @@ public class InitialDataLoader implements ApplicationRunner{
 
     @Autowired
     private LoginRepository loginRepository;
+
+    @Autowired
+    private WorkScheduleRepository workScheduleRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception{
@@ -90,6 +84,57 @@ public class InitialDataLoader implements ApplicationRunner{
                     })
                     .toList();
             positionRepository.saveAll(positions);
+        }
+
+        if(workScheduleRepository.findAll().isEmpty()){
+            List<Position> position = positionRepository.findAll();
+            boolean isWorkingDay = false;
+            for(Position post : position){
+                WorkSchedule mon = WorkSchedule.builder()
+                        .day(DayEnum.MONDAY.getValue())
+                        .workingDay(true)
+                        .namePosition(post.getPositionName())
+                        .build();
+                WorkSchedule tues = WorkSchedule.builder()
+                        .day(DayEnum.TUESDAY.getValue())
+                        .workingDay(true)
+                        .namePosition(post.getPositionName())
+                        .build();
+                WorkSchedule wed = WorkSchedule.builder()
+                        .day(DayEnum.WEDNESDAY.getValue())
+                        .workingDay(true)
+                        .namePosition(post.getPositionName())
+                        .build();
+                WorkSchedule thurs = WorkSchedule.builder()
+                        .day(DayEnum.THURSDAY.getValue())
+                        .workingDay(true)
+                        .namePosition(post.getPositionName())
+                        .build();
+                WorkSchedule fri = WorkSchedule.builder()
+                        .day(DayEnum.FRIDAY.getValue())
+                        .workingDay(true)
+                        .namePosition(post.getPositionName())
+                        .build();
+
+                if(post.getPositionName().equalsIgnoreCase(PositionEnum.ADMIN_HRD.getValue()) || post.getPositionName().equalsIgnoreCase(PositionEnum.HR_SUPERVISOR.getValue()) ||
+                    post.getPositionName().equalsIgnoreCase(PositionEnum.PPIC.getValue()) || post.getPositionName().equalsIgnoreCase(PositionEnum.ADMIN_GUDANG.getValue())){
+                    isWorkingDay = false;
+                }else {
+                    isWorkingDay = true;
+                }
+
+                WorkSchedule satur = WorkSchedule.builder()
+                        .day(DayEnum.SATURDAY.getValue())
+                        .workingDay(isWorkingDay)
+                        .namePosition(post.getPositionName())
+                        .build();
+                WorkSchedule sun = WorkSchedule.builder()
+                        .day(DayEnum.SUNDAY.getValue())
+                        .workingDay(isWorkingDay)
+                        .namePosition(post.getPositionName())
+                        .build();
+                workScheduleRepository.saveAll(List.of(mon, tues, wed, thurs, fri, satur, sun));
+            }
         }
 
         if(loginRepository.findAll().isEmpty()){

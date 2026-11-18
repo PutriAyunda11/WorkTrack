@@ -1,8 +1,7 @@
 package com.example.worktrack.model;
 
-import java.sql.Blob;
+
 import java.time.*;
-import java.util.Date;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ public class Presence {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false )
     private int id;
-    private Date datePresence;
+    private LocalDate datePresence;
     private String photoIn;
     private String photoOut;
     private LocalTime entryTime;

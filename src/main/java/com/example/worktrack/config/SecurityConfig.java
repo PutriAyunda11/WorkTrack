@@ -51,7 +51,10 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .requestMatchers("/employee/**").hasAuthority(RoleEnum.ADMIN.getValue())
+                        .requestMatchers(
+                                "/employee/**",
+                                "/employee-work-schedule/**"
+                        ).hasAuthority(RoleEnum.ADMIN.getValue())
 //                        .requestMatchers().hasAuthority(RoleEnum.EMPLOYEE.getValue())
                         .anyRequest().authenticated()
                 )
