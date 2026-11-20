@@ -9,11 +9,15 @@ import com.example.worktrack.constant.ConstantValue;
 import com.example.worktrack.dto.UpdateEmpRequest;
 import com.example.worktrack.dto.EmpResponse;
 import com.example.worktrack.enums.Status;
+import com.example.worktrack.model.EmployeeWorkSchedule;
+import com.example.worktrack.repository.EmployeeWorkScheduleRepository;
 import com.example.worktrack.service.EmployeeService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.worktrack.dto.AddEmployeeRequest;
@@ -27,11 +31,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     
     private final EmployeeRepository employeeRepository;
     private final PositionRepository positionRepository;
+    private final EmployeeWorkScheduleRepository employeeWorkScheduleRepository;
 
     // @Autowired
-    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository){
+    EmployeeServiceImpl(EmployeeRepository employeeRepository, PositionRepository positionRepository,
+                        EmployeeWorkScheduleRepository employeeWorkScheduleRepository){
         this.employeeRepository=employeeRepository;
         this.positionRepository=positionRepository;
+        this.employeeWorkScheduleRepository=employeeWorkScheduleRepository;
     }
 
     @Override
@@ -66,12 +73,27 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         Employee emp = new Employee();
+        LocalDate join = LocalDate.now();
+        if(data.getEmploymentStatus().equalsIgnoreCase(Status.PKWT.getValue()) && (data.getContractPeriod() == null || data.getContractPeriod() == 0)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contract period is required and must be greater than 0 for PKWT employees.");
+        } else if (data.getEmploymentStatus().equalsIgnoreCase(Status.PKWT.getValue()) && (data.getContractPeriod() != null || data.getContractPeriod() != 0)) {
+            LocalDate termination = join.plusMonths(data.getContractPeriod());
+
+            emp.setEmploymentStatus(Status.PKWT.getValue());
+            emp.setTerminationDate(termination);
+
+        } else if (data.getEmploymentStatus().equalsIgnoreCase(Status.PKWTT.getValue())) {
+            emp.setTerminationDate(null);
+            emp.setEmploymentStatus(Status.PKWTT.getValue());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid employment status. Allowed values are PKWT or PKWTT.");
+        }
         emp.setName(data.getName());
         emp.setEmail(email);
         emp.setNoTelp(data.getNoTelp());
         emp.setAddress(data.getAddress());
         emp.setStatus(Status.ACTIVE.getValue());
-        emp.setJoiningDate(LocalDate.now());
+        emp.setJoiningDate(join);
         emp.setMonthlySalary(data.getMonthlySalary());
         emp.setPosition(position);
 
@@ -84,6 +106,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .email(savedEmp.getEmail())
                 .noTelp(savedEmp.getNoTelp())
                 .joiningDate(savedEmp.getJoiningDate())
+                .EmploymentStatus(savedEmp.getEmploymentStatus())
+                .terminatorDate(savedEmp.getTerminationDate())
                 .status(savedEmp.getStatus())
                 .monthlySalary(savedEmp.getMonthlySalary())
                 .position(savedEmp.getPosition().getPositionName())
@@ -143,6 +167,48 @@ public class EmployeeServiceImpl implements EmployeeService {
                 emp.setMonthlySalary(data.getMonthlySalary());
         }
 
+        String status = data.getEmploymentStatus();
+        Integer contractPeriod = data.getContractPeriod();
+        if (status != null && !status.isBlank()) {
+            if (Status.PKWT.getValue().equalsIgnoreCase(status)) {
+                if (contractPeriod == null || contractPeriod <= 0) {
+                    throw new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "Contract period is required and must be greater than 0 for PKWT employees."
+                    );
+                }
+                LocalDate baseDate = emp.getJoiningDate() != null ? emp.getJoiningDate() : LocalDate.now();
+                emp.setEmploymentStatus(Status.PKWT.getValue());
+                emp.setTerminationDate(baseDate.plusMonths(contractPeriod));
+
+            } else if (Status.PKWTT.getValue().equalsIgnoreCase(status)) {
+                emp.setEmploymentStatus(Status.PKWTT.getValue());
+                emp.setTerminationDate(null);
+
+            } else {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid employment status. Allowed values are PKWT or PKWTT."
+                );
+            }
+        } else if (contractPeriod != null) {
+            if (contractPeriod <= 0) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Contract period must be greater than 0."
+                );
+            }
+            if (!Status.PKWT.getValue().equalsIgnoreCase(emp.getEmploymentStatus())) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Contract period can only be updated for PKWT employees."
+                );
+            }
+            LocalDate baseDate = emp.getJoiningDate() != null ? emp.getJoiningDate() : LocalDate.now();
+            emp.setTerminationDate(baseDate.plusMonths(contractPeriod));
+        }
+
+
         emp.setUpdateAt(LocalDateTime.now());
         Employee savedEmp = employeeRepository.save(emp);
 
@@ -155,7 +221,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .status(savedEmp.getStatus())
                 .monthlySalary(savedEmp.getMonthlySalary())
                 .joiningDate(savedEmp.getJoiningDate())
-                .position(savedEmp.getPosition().getPositionName())
+                .terminatorDate(savedEmp.getTerminationDate())
+                .EmploymentStatus(savedEmp.getEmploymentStatus())
+                .position(savedEmp.getPosition() != null ? savedEmp.getPosition().getPositionName() : null)
                 .build();
 
         return response;
@@ -163,7 +231,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<EmpResponse> getAllEmployee(Pageable pageable){
-        Page<Employee> emp = employeeRepository.findAll(pageable);
+        Page<Employee> emp = employeeRepository.findAllByStatus(Status.ACTIVE.getValue(), pageable);
 
         return emp.map(tamp -> {
             EmpResponse dataTamp= new EmpResponse();
@@ -178,5 +246,39 @@ public class EmployeeServiceImpl implements EmployeeService {
             dataTamp.setPosition(tamp.getPosition().getPositionName());
             return dataTamp;
         });
+    }
+
+    @Override
+    @Transactional
+    public void deletedEmployee(Integer employeeId){
+        if(employeeId == null){
+            throw new IllegalArgumentException("Employee ID must not be NULL");
+        }
+
+        Employee employee = employeeRepository.findByIdAndStatus(employeeId, Status.ACTIVE.getValue())
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with id = " + employeeId));
+
+        boolean isPkwt = Status.PKWT.getValue().equalsIgnoreCase(employee.getEmploymentStatus());
+        boolean isPkwtt = Status.PKWTT.getValue().equalsIgnoreCase(employee.getEmploymentStatus());
+
+        if(isPkwt){
+            LocalDate termination = employee.getTerminationDate();
+            if(termination != null && !termination.isBefore(LocalDate.now())){
+                throw new IllegalArgumentException("Employee still has remaining contract time!");
+            }
+        } else if (!isPkwtt) {
+            throw new IllegalArgumentException("Unsupported employment status: " + employee.getEmploymentStatus());
+        }
+
+        List<EmployeeWorkSchedule> schedule = employeeWorkScheduleRepository.findByEmployee_Id(employee.getId());
+        if(schedule != null && !schedule.isEmpty()){
+            for (EmployeeWorkSchedule sc : schedule){
+                sc.setWorkingDay(false);
+            }
+            employeeWorkScheduleRepository.saveAll(schedule);
+        }
+
+        employee.setStatus(Status.INACTIVE.getValue());
+        employeeRepository.save(employee);
     }
 }

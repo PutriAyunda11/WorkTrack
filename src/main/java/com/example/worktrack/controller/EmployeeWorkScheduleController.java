@@ -4,10 +4,12 @@ import com.example.worktrack.dto.*;
 import com.example.worktrack.service.EmployeeWorkScheduleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -72,8 +74,13 @@ public class EmployeeWorkScheduleController {
     }
 
     @GetMapping("/all-schedule")
-    public ResponseEntity<GenericResponse<Page<EmployeeWorkScheEntyResponse>>> getAllEmployeeSchedule(Pageable pageable){
-        Page<EmployeeWorkScheEntyResponse> result = employeeWorkScheduleService.getAllEmpWorkSchedule(pageable);
+    public ResponseEntity<GenericResponse<Page<EmployeeWorkScheEntyResponse>>> getAllEmployeeSchedule(@RequestParam(required = false) Integer employeeId,
+                                                                                                          @RequestParam(required = false) String employeeName,
+                                                                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate,
+                                                                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                                                                                          Pageable pageable){
+        Page<EmployeeWorkScheEntyResponse> result = employeeWorkScheduleService.getAllEmpWorkSchedule(employeeId, employeeName, workDate, startDate, endDate,pageable);
 
         return ResponseEntity.ok().body(GenericResponse.<Page<EmployeeWorkScheEntyResponse>>builder()
                         .success(true)

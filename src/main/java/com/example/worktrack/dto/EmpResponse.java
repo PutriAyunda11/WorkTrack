@@ -18,6 +18,8 @@ public class EmpResponse {
     private String noTelp;
     private String address;
     private LocalDate joiningDate;
+    private LocalDate terminatorDate;
+    private String EmploymentStatus;
     private String status;
     private Long monthlySalary;
     private String position;

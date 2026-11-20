@@ -29,6 +29,8 @@ public class Employee {
     private String address;
     private Long monthlySalary;
     private LocalDate joiningDate;
+    private LocalDate terminationDate;
+    private String employmentStatus;
     private LocalDateTime updateAt;
     private String status;
 

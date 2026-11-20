@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -23,6 +25,11 @@ public class AddEmployeeRequest {
 
     @NotBlank(message = "Address is required")
     private String address;
+
+    @NotBlank(message = "Employment Status is required")
+    private String employmentStatus;
+
+    private Integer contractPeriod;
 
     @NotBlank(message = "Address is required")
     private Long monthlySalary;

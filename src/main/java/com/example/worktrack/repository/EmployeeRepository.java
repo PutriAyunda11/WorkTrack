@@ -15,6 +15,7 @@ public interface EmployeeRepository extends JpaRepository<Employee,Integer>{
     Optional<Employee> findByEmail(String email);
     Employee findByNameAndPosition(String name, Position position);
     List<Employee> findByPosition_PositionName(String position);
-    Page<Employee> findAll(Pageable pageable);
+    Page<Employee> findAllByStatus(String status, Pageable pageable);
+    Optional<Employee> findByIdAndStatus(Integer id, String status);
 }
 

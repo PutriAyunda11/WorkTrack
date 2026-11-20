@@ -14,11 +14,14 @@ import com.example.worktrack.repository.PositionRepository;
 import com.example.worktrack.repository.WorkScheduleRepository;
 import com.example.worktrack.service.EmployeeWorkScheduleService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,8 +158,23 @@ public class EmployeeWorkScheduleServiceImpl implements EmployeeWorkScheduleServ
     }
 
     @Override
-    public Page<EmployeeWorkScheEntyResponse> getAllEmpWorkSchedule(Pageable pageable){
-        Page<EmployeeWorkSchedule> schedules = employeeWorkScheduleRepository.findAll(pageable);
+    public Page<EmployeeWorkScheEntyResponse> getAllEmpWorkSchedule(Integer employeeId, String employeeName,
+                                                                    LocalDate workDate, LocalDate startDate,
+                                                                    LocalDate endDate, Pageable pageable){
+
+        String normalizedEmployeeName = (employeeName == null || employeeName.isBlank()) ? null : employeeName.trim();
+
+        Pageable pageableEffective = pageable.getSort().isUnsorted() ?
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        Sort.by(Sort.Direction.DESC, "workDate")
+                )
+                : pageable;
+
+        Page<EmployeeWorkSchedule> schedules = employeeWorkScheduleRepository.searchSchedules(employeeId, normalizedEmployeeName,
+                                                                                                workDate, startDate, endDate,
+                                                                                                pageableEffective);
 
         return schedules.map(tamp -> {
             EmployeeWorkScheEntyResponse response = new EmployeeWorkScheResp();

@@ -8,11 +8,12 @@ import com.example.worktrack.model.EmployeeWorkSchedule;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface EmployeeWorkScheduleService {
     List<EmployeeWorkScheResp> aadEmployeeSchedule(EmployeeWorkScheReq req);
     EmployeeWorkScheResp updateEmployeeSchedule(UpdateEmployeeWorkScheReq req);
-    Page<EmployeeWorkScheEntyResponse> getAllEmpWorkSchedule(Pageable pageable);
+    Page<EmployeeWorkScheEntyResponse> getAllEmpWorkSchedule(Integer employeeId,String employeeName, LocalDate workDate, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
 }

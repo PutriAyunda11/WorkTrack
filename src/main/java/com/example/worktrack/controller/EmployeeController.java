@@ -86,5 +86,16 @@ public class EmployeeController {
                 .data(data)
                 .build());
     }
+
+    @PostMapping("/soft-delete")
+    public ResponseEntity<GenericResponse<Void>> softDeleted(@RequestParam Integer employeeId){
+
+        emp.deletedEmployee(employeeId);
+        return ResponseEntity.ok().body(GenericResponse.<Void>builder()
+                .success(true)
+                .message("Successfully")
+                .data(null)
+                .build());
+    }
     
 }

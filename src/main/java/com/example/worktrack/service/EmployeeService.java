@@ -12,5 +12,6 @@ public interface EmployeeService {
     Page<EmpResponse> getAllEmployee(Pageable pageable);
     EmpResponse addEmployee(AddEmployeeRequest data);
     EmpResponse updateEmployee(UpdateEmpRequest data);
+    void deletedEmployee(Integer employeeId);
     
 }

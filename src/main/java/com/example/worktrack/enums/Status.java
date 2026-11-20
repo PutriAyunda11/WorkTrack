@@ -3,14 +3,20 @@ package com.example.worktrack.enums;
 public enum Status {
     ACTIVE ("Active"),
     INACTIVE ("Inactive"),
+
+    PKWT("PKWT"),
+    PKWTT("PKWTT"),
+
     PENDING("Pending"),
     APPROVED("Approved"),
     REJECTED("Rejected"),
+
     LATE("Late"),
     ON_TIME("On Time"),
     ABSENT("Absent"),
     OVERTIME("Overtime"),
     EARLY_LEAVE("Early Leave"),
+
     SICK_LEAVE("Sick Leave"),     // sakit
     ANNUAL_LEAVE("Annual Leave"),     // cuti tahunan
     OFF_DAY("Off Day");// jadwal libur
